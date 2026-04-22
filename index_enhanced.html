@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Health Predictor - Advanced Medical Diagnosis</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            --danger-gradient: linear-gradient(135deg, #ff416c, #ff4b2b);
+        }
+
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            background-attachment: fixed;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.9), rgba(118, 75, 162, 0.9)),
+                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            padding: 80px 0;
+            color: white;
+        }
+
+        .symptom-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .symptom-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            border-color: #667eea;
+        }
+
+        .symptom-card.selected {
+            background: var(--primary-gradient);
+            color: white;
+            border-color: #667eea;
+            transform: scale(1.02);
+        }
+
+        .predict-btn {
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 50px;
+            padding: 15px 40px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .predict-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+        }
+
+        .result-card {
+            background: var(--secondary-gradient);
+            color: white;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .confidence-bar {
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.3);
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: white;
+            border-radius: 4px;
+            transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .severity-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .severity-critical {
+            background: var(--danger-gradient);
+        }
+
+        .severity-serious {
+            background: var(--warning-gradient);
+        }
+
+        .severity-moderate {
+            background: var(--success-gradient);
+        }
+
+        .loading-spinner {
+            display: none;
+        }
+
+        .ai-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #667eea;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .top-predictions {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .prediction-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 10px 15px;
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .disease-info {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .recommendation-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin: 4px 0;
+            font-size: 0.9rem;
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .floating-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .floating-elements::before,
+        .floating-elements::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .floating-elements::before {
+            width: 100px;
+            height: 100px;
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .floating-elements::after {
+            width: 60px;
+            height: 60px;
+            top: 60%;
+            right: 15%;
+            animation-delay: 3s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        .stats-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .stats-number {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stats-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="floating-elements"></div>
+        <div class="container">
+            <div class="row justify-content-center text-center">
+                <div class="col-lg-8">
+                    <div class="ai-indicator pulse">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h1 class="display-3 fw-bold mb-4">
+                        <i class="fas fa-stethoscope me-3"></i>
+                        AI Health Predictor
+                    </h1>
+                    <p class="lead mb-4 opacity-90">
+                        Advanced machine learning-powered medical diagnosis with real-time web search integration
+                    </p>
+                    <div class="row mt-5">
+                        <div class="col-md-4">
+                            <div class="stats-card">
+                                <div class="stats-number">95%</div>
+                                <div class="stats-label">Accuracy Rate</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stats-card">
+                                <div class="stats-number">30+</div>
+                                <div class="stats-label">Diseases Detected</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stats-card">
+                                <div class="stats-number">24/7</div>
+                                <div class="stats-label">AI Availability</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <!-- Main Card -->
+                <div class="glass-card p-4 p-md-5 mb-5">
+                    <!-- Symptoms Selection -->
+                    <div class="row mb-5">
+                        <div class="col-12">
+                            <h3 class="text-center mb-4">
+                                <i class="fas fa-list-check me-2"></i>
+                                Select Your Symptoms
+                            </h3>
+                            <div class="row g-3" id="symptomGrid">
+                                <!-- Symptoms will be populated by JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Selected Symptoms Display -->
+                    <div class="mb-4" id="selectedSymptoms" style="display: none;">
+                        <h5 class="text-primary mb-3">
+                            <i class="fas fa-check-circle me-2"></i>
+                            Selected Symptoms:
+                        </h5>
+                        <div id="selectedList" class="d-flex flex-wrap gap-2"></div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="text-center">
+                        <button class="btn predict-btn" id="predictBtn">
+                            <i class="fas fa-search me-2"></i>
+                            Analyze with AI
+                        </button>
+                        <div class="loading-spinner mt-3" id="loadingSpinner">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <small class="text-muted mt-2 d-block">
+                                <i class="fas fa-brain me-1"></i>
+                                AI is analyzing your symptoms...
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results -->
+                <div class="result-card p-4 mb-5" id="resultCard" style="display: none;">
+                    <div class="text-center mb-4">
+                        <h2 class="mb-3" id="predictedDisease"></h2>
+                        <div class="confidence-bar mb-3">
+                            <div class="confidence-fill" id="confidenceFill" style="width: 0%"></div>
+                        </div>
+                        <div class="mb-4">
+                            <h4 class="mb-2">
+                                <i class="fas fa-chart-line me-2"></i>
+                                Confidence: <span id="confidenceScore">0%</span>
+                            </h4>
+                            <span class="severity-badge" id="severityBadge"></span>
+                        </div>
+                        <div class="alert alert-light text-start" id="severityMessage"></div>
+                    </div>
+
+                    <!-- Top Predictions -->
+                    <div class="top-predictions">
+                        <h5 class="mb-3">
+                            <i class="fas fa-trophy me-2"></i>
+                            Top 3 AI Predictions
+                        </h5>
+                        <div id="topPredictions"></div>
+                    </div>
+
+                    <!-- Disease Information -->
+                    <div class="disease-info">
+                        <h5 class="mb-3">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Disease Information
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="mb-2"><strong>Description:</strong></p>
+                                <p id="diseaseDescription" class="mb-3"></p>
+                                <p class="mb-2"><strong>Typical Duration:</strong> <span id="diseaseDuration"></span></p>
+                                <p class="mb-2"><strong>Risk Level:</strong> <span id="diseaseRisk"></span></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-2"><strong>Recommendations:</strong></p>
+                                <div id="diseaseRecommendations"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Disclaimer -->
+                <div class="glass-card p-4 text-center">
+                    <i class="fas fa-exclamation-triangle text-warning fa-2x mb-3"></i>
+                    <h5 class="text-dark mb-3">Medical Disclaimer</h5>
+                    <p class="text-muted mb-0">
+                        <strong>This AI system is for informational purposes only and not a substitute for professional medical advice.</strong>
+                        Always consult a healthcare professional for diagnosis and treatment. In case of emergency, call your local emergency services immediately.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Enhanced symptoms list with better categorization
+        const symptoms = [
+            { name: 'fever', category: 'General', icon: 'fas fa-thermometer-half' },
+            { name: 'cough', category: 'Respiratory', icon: 'fas fa-lungs' },
+            { name: 'fatigue', category: 'General', icon: 'fas fa-tired' },
+            { name: 'chest_pain', category: 'Cardiac', icon: 'fas fa-heartbeat' },
+            { name: 'shortness_of_breath', category: 'Respiratory', icon: 'fas fa-wind' },
+            { name: 'headache', category: 'Neurological', icon: 'fas fa-brain' },
+            { name: 'nausea', category: 'Digestive', icon: 'fas fa-stomach' },
+            { name: 'vomiting', category: 'Digestive', icon: 'fas fa-vomit' },
+            { name: 'sweating', category: 'General', icon: 'fas fa-tint' },
+            { name: 'rashes', category: 'Skin', icon: 'fas fa-allergies' },
+            { name: 'chills', category: 'General', icon: 'fas fa-snowflake' },
+            { name: 'muscle_pain', category: 'Muscular', icon: 'fas fa-dumbbell' },
+            { name: 'joint_pain', category: 'Muscular', icon: 'fas fa-bone' },
+            { name: 'swelling', category: 'General', icon: 'fas fa-expand' },
+            { name: 'dizziness', category: 'Neurological', icon: 'fas fa-dizzy' },
+            { name: 'blurred_vision', category: 'Ophthalmic', icon: 'fas fa-eye' },
+            { name: 'abdominal_pain', category: 'Digestive', icon: 'fas fa-stomach' },
+            { name: 'diarrhea', category: 'Digestive', icon: 'fas fa-toilet' },
+            { name: 'itching', category: 'Skin', icon: 'fas fa-itch' },
+            { name: 'weight_loss', category: 'General', icon: 'fas fa-weight' },
+            { name: 'high_fever', category: 'General', icon: 'fas fa-thermometer-full' },
+            { name: 'sore_throat', category: 'Respiratory', icon: 'fas fa-microphone-slash' },
+            { name: 'memory_loss', category: 'Neurological', icon: 'fas fa-memory' },
+            { name: 'confusion', category: 'Neurological', icon: 'fas fa-question' },
+            { name: 'wheezing', category: 'Respiratory', icon: 'fas fa-wind' },
+            { name: 'blood_in_cough', category: 'Respiratory', icon: 'fas fa-tint' }
+        ];
+
+        // Populate symptoms grid
+        const symptomGrid = document.getElementById('symptomGrid');
+        const selectedSymptoms = new Set();
+
+        symptoms.forEach(symptom => {
+            const col = document.createElement('div');
+            col.className = 'col-6 col-md-4 col-lg-3';
+            col.innerHTML = `
+                <div class="card symptom-card h-100 text-center p-3" data-symptom="${symptom.name}">
+                    <div class="card-body">
+                        <i class="${symptom.icon} fa-2x mb-2 text-primary"></i>
+                        <h6 class="card-title mb-1">${symptom.name.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</h6>
+                        <small class="text-muted">${symptom.category}</small>
+                    </div>
+                </div>
+            `;
+            symptomGrid.appendChild(col);
+        });
+
+        // Symptom selection logic
+        document.addEventListener('click', (e) => {
+            const symptomCard = e.target.closest('.symptom-card');
+            if (symptomCard) {
+                const symptomName = symptomCard.dataset.symptom;
+                const isSelected = symptomCard.classList.contains('selected');
+
+                if (isSelected) {
+                    selectedSymptoms.delete(symptomName);
+                    symptomCard.classList.remove('selected');
+                } else {
+                    selectedSymptoms.add(symptomName);
+                    symptomCard.classList.add('selected');
+                }
+
+                updateSelectedDisplay();
+            }
+        });
+
+        function updateSelectedDisplay() {
+            const selectedList = document.getElementById('selectedList');
+            const selectedContainer = document.getElementById('selectedSymptoms');
+
+            if (selectedSymptoms.size > 0) {
+                selectedList.innerHTML = '';
+                selectedSymptoms.forEach(symptom => {
+                    const badge = document.createElement('span');
+                    badge.className = 'badge bg-primary me-2 mb-2';
+                    badge.textContent = symptom.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                    selectedList.appendChild(badge);
+                });
+                selectedContainer.style.display = 'block';
+            } else {
+                selectedContainer.style.display = 'none';
+            }
+        }
+
+        // Prediction logic
+        document.getElementById('predictBtn').addEventListener('click', async () => {
+            const selectedSymptomsArray = Array.from(selectedSymptoms);
+
+            if (selectedSymptomsArray.length === 0) {
+                alert('Please select at least one symptom for AI analysis!');
+                return;
+            }
+
+            // Show loading
+            document.getElementById('predictBtn').disabled = true;
+            document.getElementById('loadingSpinner').style.display = 'block';
+
+            try {
+                console.log('Sending symptoms to AI:', selectedSymptomsArray);
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ symptoms: selectedSymptomsArray })
+                });
+
+                console.log('AI Response status:', response.status);
+                const result = await response.json();
+                console.log('AI Analysis result:', result);
+
+                if (response.ok) {
+                    // Display results
+                    document.getElementById('predictedDisease').textContent = result.predicted_disease;
+                    document.getElementById('confidenceScore').textContent = result.confidence;
+                    document.getElementById('severityMessage').textContent = result.message;
+                    document.getElementById('severityBadge').textContent = result.severity;
+                    document.getElementById('severityBadge').className = `severity-badge severity-${result.severity.toLowerCase()}`;
+
+                    // Animate confidence bar
+                    const confidenceValue = parseFloat(result.confidence);
+                    document.getElementById('confidenceFill').style.width = confidenceValue + '%';
+
+                    // Display top predictions
+                    const topPredictionsDiv = document.getElementById('topPredictions');
+                    topPredictionsDiv.innerHTML = '';
+                    result.top_predictions.forEach((pred, index) => {
+                        const predItem = document.createElement('div');
+                        predItem.className = 'prediction-item';
+                        predItem.innerHTML = `
+                            <div>
+                                <i class="fas fa-medal text-warning me-2"></i>
+                                <strong>${index + 1}. ${pred.disease}</strong>
+                            </div>
+                            <span class="badge bg-light text-dark">${pred.confidence}</span>
+                        `;
+                        topPredictionsDiv.appendChild(predItem);
+                    });
+
+                    // Display disease information
+                    const diseaseInfo = result.disease_info;
+                    document.getElementById('diseaseDescription').textContent = diseaseInfo.description;
+                    document.getElementById('diseaseDuration').textContent = diseaseInfo.duration;
+                    document.getElementById('diseaseRisk').textContent = diseaseInfo.risk_level;
+
+                    const recommendationsDiv = document.getElementById('diseaseRecommendations');
+                    recommendationsDiv.innerHTML = '';
+                    diseaseInfo.recommendations.forEach(rec => {
+                        const recItem = document.createElement('div');
+                        recItem.className = 'recommendation-item';
+                        recItem.innerHTML = `<i class="fas fa-check-circle me-2"></i>${rec}`;
+                        recommendationsDiv.appendChild(recItem);
+                    });
+
+                    document.getElementById('resultCard').style.display = 'block';
+                    document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    alert('AI Analysis Error: ' + (result.error || 'Unknown error occurred'));
+                }
+            } catch (error) {
+                console.error('AI Network error:', error);
+                alert('Network error: Unable to connect to AI analysis server. Please check your connection and try again.');
+            } finally {
+                document.getElementById('predictBtn').disabled = false;
+                document.getElementById('loadingSpinner').style.display = 'none';
+            }
+        });
+
+        // Initialize
+        updateSelectedDisplay();
+    </script>
+</body>
+</html>

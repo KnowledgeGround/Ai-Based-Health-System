@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediAI - Advanced Health Intelligence</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.15);
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-accent: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-success: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            --gradient-warning: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            --gradient-danger: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 2rem;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--gradient-primary);
+            background-attachment: fixed;
+            color: var(--dark);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        .smooth-scroll {
+            scroll-behavior: smooth;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .slide-up {
+            animation: slideUp 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background:
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 219, 226, 0.3) 0%, transparent 50%);
+        }
+
+        .floating-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            background: var(--glass);
+            backdrop-filter: blur(40px);
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .shape:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .shape:nth-child(2) {
+            width: 60px;
+            height: 60px;
+            top: 20%;
+            right: 10%;
+            animation-delay: 5s;
+        }
+
+        .shape:nth-child(3) {
+            width: 100px;
+            height: 100px;
+            bottom: 20%;
+            left: 20%;
+            animation-delay: 10s;
+        }
+
+        .shape:nth-child(4) {
+            width: 40px;
+            height: 40px;
+            bottom: 10%;
+            right: 20%;
+            animation-delay: 15s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg);
+                opacity: 0.7;
+            }
+            50% {
+                transform: translateY(-20px) rotate(180deg);
+                opacity: 1;
+            }
+        }
+
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .hero-section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-content {
+            text-align: center;
+            color: white;
+            max-width: 800px;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .hero-title {
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.8) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 40px rgba(255, 255, 255, 0.3);
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            font-weight: 300;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            min-width: 120px;
+            animation: fadeInUp 1s ease-out 0.4s both;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            opacity: 0.8;
+            font-weight: 500;
+        }
+
+        .ai-brain {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 2rem;
+        }
+
+        .brain-icon {
+            font-size: 4rem;
+            color: var(--accent);
+            filter: drop-shadow(0 0 20px rgba(6, 182, 212, 0.5));
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        .brain-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.3) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: breathe 4s ease-in-out infinite;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.1);
+                opacity: 0.8;
+            }
+        }
+
+        @keyframes breathe {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.5;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 0.8;
+            }
+        }
+
+        .main-content {
+            padding: 4rem 0;
+            position: relative;
+            z-index: 1;
+            scroll-behavior: smooth;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: white;
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .section-title p {
+            font-size: 1.125rem;
+            opacity: 0.8;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .symptoms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .symptom-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .symptom-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .symptom-card:hover::before {
+            left: 100%;
+        }
+
+        .symptom-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--accent);
+        }
+
+        .symptom-card.selected {
+            background: var(--gradient-accent);
+            color: white;
+            border-color: var(--accent);
+            box-shadow: 0 0 30px rgba(6, 182, 212, 0.3);
+        }
+
+        .symptom-card.selected .symptom-icon {
+            color: white;
+        }
+
+        .symptom-icon {
+            font-size: 2rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .symptom-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 1.125rem;
+        }
+
+        .symptom-category {
+            font-size: 0.875rem;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .analyze-btn {
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: 50px;
+            padding: 1rem 3rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: white;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .analyze-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .analyze-btn:hover::before {
+            left: 100%;
+        }
+
+        .analyze-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+        }
+
+        .analyze-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading-container {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--glass-border);
+            border-top: 4px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .results-section {
+            display: none;
+            margin-top: 3rem;
+        }
+
+        .results-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2.5rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .results-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-accent);
+        }
+
+        .prediction-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .prediction-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.8) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .confidence-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .confidence-bar {
+            flex: 1;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: var(--gradient-accent);
+            border-radius: 6px;
+            width: 0%;
+            transition: width 2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .confidence-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .confidence-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .severity-badge {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 1.5rem;
+        }
+
+        .severity-critical {
+            background: var(--gradient-danger);
+            color: white;
+        }
+
+        .severity-serious {
+            background: var(--gradient-warning);
+            color: white;
+        }
+
+        .severity-moderate {
+            background: var(--gradient-success);
+            color: white;
+        }
+
+        .severity-low {
+            background: var(--gradient-accent);
+            color: white;
+        }
+
+        .alert-message {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .alert-message.critical {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .alert-message.serious {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+
+        .alert-message.moderate {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .top-predictions {
+            margin-bottom: 2rem;
+        }
+
+        .predictions-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .prediction-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            margin-bottom: 0.5rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .prediction-rank {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--gradient-accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.875rem;
+            color: white;
+            margin-right: 1rem;
+        }
+
+        .prediction-name {
+            flex: 1;
+            font-weight: 600;
+        }
+
+        .prediction-confidence {
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .disease-info {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .disease-info-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .info-item {
+            margin-bottom: 1.5rem;
+        }
+
+        .info-label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .info-value {
+            font-size: 1.125rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .recommendations-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .recommendation-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            font-size: 0.875rem;
+        }
+
+        .recommendation-icon {
+            color: var(--success);
+            margin-top: 0.125rem;
+        }
+
+        .disclaimer-section {
+            margin-top: 4rem;
+            text-align: center;
+        }
+
+        .disclaimer-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .disclaimer-icon {
+            font-size: 2rem;
+            color: var(--warning);
+            margin-bottom: 1rem;
+        }
+
+        .disclaimer-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .disclaimer-text {
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+
+        .selected-symptoms {
+            display: none;
+            margin-top: 2rem;
+        }
+
+        .selected-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .selected-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .selected-badge {
+            background: var(--gradient-accent);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .selected-badge i {
+            font-size: 0.75rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero-stats {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .symptoms-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-title {
+                font-size: 2.5rem;
+            }
+        }
+
+        .scroll-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.25rem;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .scroll-to-top.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .scroll-to-top:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="hero-bg">
+        <div class="floating-shapes">
+            <div class="shape"></div>
+            <div class="shape"></div>
+            <div class="shape"></div>
+            <div class="shape"></div>
+        </div>
+    </div>
+
+    <section class="hero-section">
+        <div class="hero-content">
+            <div class="ai-brain">
+                <div class="brain-glow"></div>
+                <i class="fas fa-brain brain-icon"></i>
+            </div>
+            <h1 class="hero-title">MediAI</h1>
+            <p class="hero-subtitle">Advanced Health Intelligence Powered by Machine Learning</p>
+
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <div class="stat-number">99%</div>
+                    <div class="stat-label">AI Accuracy</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">30+</div>
+                    <div class="stat-label">Diseases Detected</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">AI Availability</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <main class="main-content">
+        <div class="container">
+            <section class="symptoms-section">
+                <div class="section-title">
+                    <h2><i class="fas fa-stethoscope me-3"></i>Symptom Analysis</h2>
+                    <p>Select all symptoms you're experiencing for accurate AI-powered health assessment</p>
+                </div>
+
+                <div class="glass-card p-4">
+                    <div class="symptoms-grid" id="symptomGrid">
+                        <!-- Symptoms will be populated by JavaScript -->
+                    </div>
+
+                    <div class="selected-symptoms" id="selectedSymptoms">
+                        <div class="selected-header">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Selected Symptoms</span>
+                        </div>
+                        <div class="selected-list" id="selectedList"></div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button class="analyze-btn" id="predictBtn">
+                            <i class="fas fa-brain me-2"></i>
+                            Analyze with AI
+                        </button>
+
+                        <div class="loading-container" id="loadingSpinner">
+                            <div class="loading-spinner"></div>
+                            <h4>AI Analysis in Progress</h4>
+                            <p>Processing your symptoms with advanced machine learning algorithms...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="results-section" id="resultCard">
+                <div class="results-card">
+                    <div class="prediction-header">
+                        <h2 class="prediction-title" id="predictedDisease">Analyzing...</h2>
+
+                        <div class="confidence-display">
+                            <div class="confidence-bar">
+                                <div class="confidence-fill" id="confidenceFill"></div>
+                            </div>
+                            <div class="confidence-text" id="confidenceScore">0%</div>
+                        </div>
+
+                        <div class="severity-badge" id="severityBadge">Analyzing</div>
+                    </div>
+
+                    <div class="alert-message" id="severityMessage">
+                        <i class="fas fa-info-circle me-2"></i>
+                        AI is processing your health data...
+                    </div>
+
+                    <div class="top-predictions">
+                        <div class="predictions-title">
+                            <i class="fas fa-trophy"></i>
+                            Top AI Predictions
+                        </div>
+                        <div id="topPredictions">
+                            <div class="prediction-item">
+                                <div class="prediction-rank">1</div>
+                                <div class="prediction-name">Analyzing...</div>
+                                <div class="prediction-confidence">0%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="disease-info">
+                        <div class="disease-info-title">
+                            <i class="fas fa-info-circle"></i>
+                            Disease Information
+                        </div>
+
+                        <div class="info-grid">
+                            <div>
+                                <div class="info-item">
+                                    <div class="info-label">Description</div>
+                                    <div class="info-value" id="diseaseDescription">AI is gathering medical information...</div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-label">Typical Duration</div>
+                                    <div class="info-value" id="diseaseDuration">Analyzing duration...</div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-label">Risk Level</div>
+                                    <div class="info-value" id="diseaseRisk">Assessing risk level...</div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="info-item">
+                                    <div class="info-label">Recommendations</div>
+                                    <div class="recommendations-list" id="diseaseRecommendations">
+                                        <div class="recommendation-item">
+                                            <i class="fas fa-check-circle recommendation-icon"></i>
+                                            <span>Consult healthcare professional</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="disclaimer-section">
+        <div class="disclaimer-card">
+            <div class="disclaimer-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3 class="disclaimer-title">Medical Disclaimer</h3>
+            <p class="disclaimer-text">
+                <strong>This AI-powered health assessment system is for informational purposes only and not a substitute for professional medical advice, diagnosis, or treatment.</strong>
+                Always consult a qualified healthcare professional for any health concerns. In case of medical emergency, call your local emergency services immediately (911 in the US).
+                This system uses machine learning algorithms trained on medical data but cannot replace human medical expertise.
+            </p>
+        </div>
+    </footer>
+
+    <button class="scroll-to-top" id="scrollToTop">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const symptoms = [
+            { name: 'fever', category: 'General', icon: 'fas fa-thermometer-half', color: '#ef4444' },
+            { name: 'cough', category: 'Respiratory', icon: 'fas fa-lungs', color: '#06b6d4' },
+            { name: 'fatigue', category: 'General', icon: 'fas fa-tired', color: '#8b5cf6' },
+            { name: 'chest_pain', category: 'Cardiac', icon: 'fas fa-heartbeat', color: '#ef4444' },
+            { name: 'shortness_of_breath', category: 'Respiratory', icon: 'fas fa-wind', color: '#06b6d4' },
+            { name: 'headache', category: 'Neurological', icon: 'fas fa-brain', color: '#8b5cf6' },
+            { name: 'nausea', category: 'Digestive', icon: 'fas fa-stomach', color: '#10b981' },
+            { name: 'vomiting', category: 'Digestive', icon: 'fas fa-vomit', color: '#10b981' },
+            { name: 'sweating', category: 'General', icon: 'fas fa-tint', color: '#3b82f6' },
+            { name: 'rashes', category: 'Skin', icon: 'fas fa-allergies', color: '#f59e0b' },
+            { name: 'chills', category: 'General', icon: 'fas fa-snowflake', color: '#3b82f6' },
+            { name: 'muscle_pain', category: 'Muscular', icon: 'fas fa-dumbbell', color: '#ec4899' },
+            { name: 'joint_pain', category: 'Muscular', icon: 'fas fa-bone', color: '#ec4899' },
+            { name: 'swelling', category: 'General', icon: 'fas fa-expand', color: '#3b82f6' },
+            { name: 'dizziness', category: 'Neurological', icon: 'fas fa-dizzy', color: '#8b5cf6' },
+            { name: 'blurred_vision', category: 'Ophthalmic', icon: 'fas fa-eye', color: '#06b6d4' },
+            { name: 'abdominal_pain', category: 'Digestive', icon: 'fas fa-stomach', color: '#10b981' },
+            { name: 'diarrhea', category: 'Digestive', icon: 'fas fa-toilet', color: '#10b981' },
+            { name: 'itching', category: 'Skin', icon: 'fas fa-itch', color: '#f59e0b' },
+            { name: 'weight_loss', category: 'General', icon: 'fas fa-weight', color: '#8b5cf6' },
+            { name: 'high_fever', category: 'General', icon: 'fas fa-thermometer-full', color: '#ef4444' },
+            { name: 'sore_throat', category: 'Respiratory', icon: 'fas fa-microphone-slash', color: '#06b6d4' },
+            { name: 'memory_loss', category: 'Neurological', icon: 'fas fa-memory', color: '#8b5cf6' },
+            { name: 'confusion', category: 'Neurological', icon: 'fas fa-question', color: '#8b5cf6' },
+            { name: 'wheezing', category: 'Respiratory', icon: 'fas fa-wind', color: '#06b6d4' },
+            { name: 'blood_in_cough', category: 'Respiratory', icon: 'fas fa-tint', color: '#ef4444' }
+        ];
+
+        const selectedSymptoms = new Set();
+
+        function populateSymptoms() {
+            const symptomGrid = document.getElementById('symptomGrid');
+
+            symptoms.forEach(symptom => {
+                const card = document.createElement('div');
+                card.className = 'symptom-card';
+                card.dataset.symptom = symptom.name;
+
+                card.innerHTML = `
+                    <div class="symptom-icon">
+                        <i class="${symptom.icon}"></i>
+                    </div>
+                    <div class="symptom-name">${symptom.name.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</div>
+                    <div class="symptom-category">${symptom.category}</div>
+                `;
+
+                card.addEventListener('click', () => toggleSymptom(symptom.name));
+                symptomGrid.appendChild(card);
+            });
+        }
+
+        function toggleSymptom(symptomName) {
+            const card = document.querySelector(`[data-symptom="${symptomName}"]`);
+            const isSelected = selectedSymptoms.has(symptomName);
+
+            if (isSelected) {
+                selectedSymptoms.delete(symptomName);
+                card.classList.remove('selected');
+            } else {
+                selectedSymptoms.add(symptomName);
+                card.classList.add('selected');
+            }
+
+            updateSelectedDisplay();
+        }
+
+        function updateSelectedDisplay() {
+            const selectedContainer = document.getElementById('selectedSymptoms');
+            const selectedList = document.getElementById('selectedList');
+
+            if (selectedSymptoms.size > 0) {
+                selectedList.innerHTML = '';
+                selectedSymptoms.forEach(symptom => {
+                    const symptomData = symptoms.find(s => s.name === symptom);
+                    const badge = document.createElement('div');
+                    badge.className = 'selected-badge';
+                    badge.innerHTML = `
+                        <i class="${symptomData.icon}"></i>
+                        ${symptom.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                    `;
+                    selectedList.appendChild(badge);
+                });
+                selectedContainer.style.display = 'block';
+            } else {
+                selectedContainer.style.display = 'none';
+            }
+        }
+
+        document.getElementById('predictBtn').addEventListener('click', async () => {
+            const selectedSymptomsArray = Array.from(selectedSymptoms);
+
+            if (selectedSymptomsArray.length === 0) {
+                alert('Please select at least one symptom for AI analysis!');
+                return;
+            }
+
+            document.getElementById('predictBtn').disabled = true;
+            document.getElementById('loadingSpinner').style.display = 'block';
+
+            try {
+                console.log('Sending symptoms to AI:', selectedSymptomsArray);
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ symptoms: selectedSymptomsArray })
+                });
+
+                console.log('AI Response status:', response.status);
+                const result = await response.json();
+                console.log('AI Analysis result:', result);
+
+                if (response.ok) {
+                    document.getElementById('predictedDisease').textContent = result.predicted_disease;
+                    document.getElementById('confidenceScore').textContent = result.confidence;
+
+                    const confidenceValue = parseFloat(result.confidence);
+                    document.getElementById('confidenceFill').style.width = confidenceValue + '%';
+
+                    document.getElementById('severityBadge').textContent = result.severity;
+                    document.getElementById('severityBadge').className = `severity-badge severity-${result.severity.toLowerCase()}`;
+
+                    const alertMessage = document.getElementById('severityMessage');
+                    alertMessage.innerHTML = `<i class="fas fa-info-circle me-2"></i>${result.message}`;
+                    alertMessage.className = `alert-message ${result.severity.toLowerCase()}`;
+
+                    if (result.top_predictions) {
+                        const topPredictionsDiv = document.getElementById('topPredictions');
+                        topPredictionsDiv.innerHTML = '';
+                        result.top_predictions.forEach((pred, index) => {
+                            const predItem = document.createElement('div');
+                            predItem.className = 'prediction-item';
+                            predItem.innerHTML = `
+                                <div class="prediction-rank">${index + 1}</div>
+                                <div class="prediction-name">${pred.disease}</div>
+                                <div class="prediction-confidence">${pred.confidence}</div>
+                            `;
+                            topPredictionsDiv.appendChild(predItem);
+                        });
+                    }
+
+                    if (result.disease_info) {
+                        const diseaseInfo = result.disease_info;
+                        document.getElementById('diseaseDescription').textContent = diseaseInfo.description;
+                        document.getElementById('diseaseDuration').textContent = diseaseInfo.duration;
+                        document.getElementById('diseaseRisk').textContent = diseaseInfo.risk_level;
+
+                        const recommendationsDiv = document.getElementById('diseaseRecommendations');
+                        recommendationsDiv.innerHTML = '';
+                        diseaseInfo.recommendations.forEach(rec => {
+                            const recItem = document.createElement('div');
+                            recItem.className = 'recommendation-item';
+                            recItem.innerHTML = `
+                                <i class="fas fa-check-circle recommendation-icon"></i>
+                                <span>${rec}</span>
+                            `;
+                            recommendationsDiv.appendChild(recItem);
+                        });
+                    }
+
+                    document.getElementById('resultCard').style.display = 'block';
+                    document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    alert('AI Analysis Error: ' + (result.error || 'Unknown error occurred'));
+                }
+            } catch (error) {
+                console.error('AI Network error:', error);
+                alert('Network error: Unable to connect to AI analysis server. Please check your connection and try again.');
+            } finally {
+                document.getElementById('predictBtn').disabled = false;
+                document.getElementById('loadingSpinner').style.display = 'none';
+            }
+        });
+
+        const scrollToTopBtn = document.getElementById('scrollToTop');
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                scrollToTopBtn.classList.add('show');
+            } else {
+                scrollToTopBtn.classList.remove('show');
+            }
+        });
+
+        scrollToTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Intersection Observer for smooth animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
+                }
+            });
+        }, observerOptions);
+
+        // Observe elements for animation
+        document.querySelectorAll('.symptom-card, .results-card, .disclaimer-card').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Add smooth scrolling to symptom grid
+        const symptomGrid = document.getElementById('symptomGrid');
+        if (symptomGrid) {
+            symptomGrid.style.scrollBehavior = 'smooth';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            populateSymptoms();
+            updateSelectedDisplay();
+            
+            // Add smooth scroll class to body
+            document.body.classList.add('smooth-scroll');
+        });
+    </script>
+</body>
+</html>

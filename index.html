@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Symptom Checker - Health Prediction</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Poppins', sans-serif; }
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
+        .card { border: none; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+        .symptom-card { transition: transform 0.3s ease; }
+        .symptom-card:hover { transform: translateY(-5px); }
+        .btn-primary { background: linear-gradient(45deg, #667eea, #764ba2); border: none; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        .result-card { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; }
+        .serious { background: linear-gradient(135deg, #ff6b6b, #ee5a24) !important; }
+        .disclaimer { background: rgba(255,255,255,0.9); border-radius: 15px; padding: 20px; }
+        .loading { display: none; }
+        .confidence-bar { height: 10px; border-radius: 10px; background: rgba(255,255,255,0.3); }
+        .confidence-fill { height: 100%; border-radius: 10px; transition: width 1s ease; }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <!-- Header -->
+                <div class="text-center mb-5">
+                    <i class="fas fa-stethoscope fa-4x text-white mb-4"></i>
+                    <h1 class="display-4 text-white fw-bold">Symptom Checker</h1>
+                    <p class="lead text-white-50">Enter your symptoms and get health predictions</p>
+                </div>
+
+                <!-- Main Card -->
+                <div class="card p-4 p-md-5">
+                    <!-- Symptoms Selection -->
+                    <div class="row mb-5">
+                        <div class="col-md-8 mx-auto">
+                            <h3 class="text-center mb-4"><i class="fas fa-list-ul"></i> Select Your Symptoms</h3>
+                            <div class="row g-3" id="symptomGrid">
+                                <!-- Symptoms will be populated by JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="text-center">
+                        <button class="btn btn-primary btn-lg px-5 py-3" id="predictBtn">
+                            <i class="fas fa-search"></i> Predict Disease
+                        </button>
+                        <div class="loading mt-3" id="loadingSpinner">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <small class="text-muted">Analyzing symptoms...</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results -->
+                <div class="card mt-5 result-card p-4" id="resultCard" style="display: none;">
+                    <div class="text-center">
+                        <h2 id="predictedDisease" class="mb-3"></h2>
+                        <div class="confidence-bar mb-4 mx-auto" style="width: 300px;">
+                            <div class="confidence-fill bg-white" id="confidenceFill" style="width: 0%"></div>
+                        </div>
+                        <div class="mb-4">
+                            <h5><i class="fas fa-chart-line"></i> Confidence: <span id="confidenceScore">0%</span></h5>
+                            <h6 class="badge fs-6 px-4 py-2" id="severityBadge"></h6>
+                        </div>
+                        <div class="alert alert-warning" id="severityMessage"></div>
+                    </div>
+                </div>
+
+                <!-- Disclaimer -->
+                <div class="disclaimer mt-5 text-center">
+                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                    <strong>Disclaimer:</strong> This system is for informational purposes only and not a substitute for professional medical advice. Always consult a healthcare professional for diagnosis and treatment.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Sample symptoms list (matching training data format)
+        const symptoms = [
+            'fever', 'cough', 'fatigue', 'chest_pain', 'shortness_of_breath', 'headache',
+            'nausea', 'vomiting', 'sweating', 'rashes', 'chills', 'muscle_pain',
+            'joint_pain', 'swelling', 'dizziness', 'blurred_vision', 'abdominal_pain',
+            'diarrhea', 'itching', 'weight_loss', 'high_fever', 'sore_throat',
+            'memory_loss', 'confusion', 'wheezing', 'blood_in_cough'
+        ];
+
+        // Populate symptoms grid
+        const symptomGrid = document.getElementById('symptomGrid');
+        symptoms.forEach(symptom => {
+            const col = document.createElement('div');
+            col.className = 'col-6 col-md-4 col-lg-3';
+            col.innerHTML = `
+                <div class="card symptom-card border-0 h-100 text-center p-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="${symptom}" id="symptom_${symptom}">
+                        <label class="form-check-label fw-medium" for="symptom_${symptom}">
+                            ${symptom.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                        </label>
+                    </div>
+                </div>
+            `;
+            symptomGrid.appendChild(col);
+        });
+
+        // Prediction logic
+        document.getElementById('predictBtn').addEventListener('click', async () => {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+            const selectedSymptoms = Array.from(checkboxes).map(cb => cb.value);
+
+            if (selectedSymptoms.length === 0) {
+                alert('Please select at least one symptom!');
+                return;
+            }
+
+            // Show loading
+            document.getElementById('predictBtn').disabled = true;
+            document.getElementById('loadingSpinner').style.display = 'block';
+
+            try {
+                console.log('Sending symptoms:', selectedSymptoms);
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ symptoms: selectedSymptoms })
+                });
+
+                console.log('Response status:', response.status);
+                const result = await response.json();
+                console.log('Response data:', result);
+
+                if (response.ok) {
+                    // Display results
+                    document.getElementById('predictedDisease').textContent = result.predicted_disease;
+                    document.getElementById('confidenceScore').textContent = result.confidence;
+                    document.getElementById('severityMessage').textContent = result.message;
+                    document.getElementById('severityBadge').textContent = result.severity;
+                    
+                    // Animate confidence bar
+                    const confidenceValue = parseFloat(result.confidence);
+                    document.getElementById('confidenceFill').style.width = confidenceValue + '%';
+                    
+                    // Add serious class if needed
+                    const resultCard = document.getElementById('resultCard');
+                    if (result.severity === 'Serious') {
+                        resultCard.classList.add('serious');
+                    } else {
+                        resultCard.classList.remove('serious');
+                    }
+                    
+                    document.getElementById('resultCard').style.display = 'block';
+                    document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    alert('Error: ' + (result.error || 'Unknown error occurred'));
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+                alert('Network error: ' + error.message + '. Make sure the server is running on http://localhost:5000');
+            } finally {
+                document.getElementById('predictBtn').disabled = false;
+                document.getElementById('loadingSpinner').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
